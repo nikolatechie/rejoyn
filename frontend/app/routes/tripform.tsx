@@ -3,11 +3,13 @@ import React, { useState } from "react";
 const TripForm: React.FC = () => {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+  const [loading, setLoading] = useState(false)
   const [topDestinations, setTopDestinations] = useState([]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     console.log(startDate, endDate);
+    setLoading(true);
 
     try {
       const response = await fetch(`http://0.0.0.0:8000/top-destinations?group_id=0`, {
@@ -16,6 +18,7 @@ const TripForm: React.FC = () => {
           "Content-Type": "application/json",
         },
       });
+      setLoading(false);
       const data = await response.json();
       if (response.ok) {
         // success
@@ -34,7 +37,7 @@ const TripForm: React.FC = () => {
   return (
     <div
       style={{
-        maxWidth: "50%",
+        width: "80%",
         margin: "auto",
         marginTop: "100px",
       }}
@@ -72,6 +75,27 @@ const TripForm: React.FC = () => {
           Get recommendations
         </button>
       </div>
+      {loading && <h3 style={{ marginTop: "80px" }}>Finding a perfect holiday for your group...</h3>}
+      {topDestinations.length > 0 && (
+        <div style={{ marginTop: "40px" }}>
+          <h3>Top Destinations:</h3>
+          <ul style={{ marginTop: "40px" }}>
+            {topDestinations.map((destination, index) => (
+              <li key={index} style={{ marginBottom: "20px" }}>
+                <strong>{index + 1}</strong><br />
+                <strong>Destination:</strong> {destination["en-GB"]} <br />
+                <strong>Score:</strong> {(parseFloat(destination['score']) * 100).toFixed(0)}%<br />
+                <strong>Description:</strong> {destination['description']} <br />
+                <strong>Vibes:</strong> {Object.keys(destination['vibes'])
+                  .filter((key) => destination['vibes'][key] === "1")
+                  .map((key) => key.replace(/_/g, " "))
+                  .join(", ")}.
+                <br />
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
   );
 };
