@@ -93,13 +93,39 @@ def create_single_group_weight_vector(user_prefs):
     group_avg = {f: group_raw[f] / len(user_prefs) for f in FEATURES}
 
     # Normalise the group vector
-    total = sum(group_avg.values())
-    group_weights = {k: v / total for k, v in group_avg.items()}
+    # total = sum(group_avg.values())
+    group_weights = {k: (v - 1) / 4 for k, v in group_avg.items()}
 
     return group_weights
 
 
-print(create_single_group_weight_vector(mock_user_prefs))
+# Rate each destination based on group weights
+def score_destination(vibes, group_weights, neutral_score=0.5):
+    raw_score = sum(
+        float(vibes.get(k, neutral_score)) * group_weights.get(k, 0)
+        for k in group_weights
+    )
+    max_possible_score = sum(
+        abs(weight) for weight in group_weights.values()
+    )  # Denominator
+    if max_possible_score == 0:
+        return 0.0
+    normalized_score = raw_score / max_possible_score
+    return normalized_score
+
+
+if __name__ == "__main__":
+    df = load_csv_values("iata_airports_and_locations_with_vibes.csv")
+    df = apply_parse_vibes(df)
+    group_weights = create_single_group_weight_vector(
+        mock_user_prefs
+    )  # Mock user prefs
+    df["score"] = df["vibes"].apply(score_destination, group_weights=group_weights)
+
+    # Get top 10 destinations for the group
+    top_destinations = df.sort_values(by="score", ascending=False).head(10)
+    print(top_destinations)
+
 
 # unique_vibes = _extract_unique_vibes("iata_airports_and_locations_with_vibes.csv")
 # print(unique_vibes)
