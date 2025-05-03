@@ -31,6 +31,7 @@ const TripForm: React.FC = () => {
           id="startDate"
           value={startDate}
           onChange={(e) => setStartDate(e.target.value)}
+          min={new Date().toISOString().split("T")[0]} // Set minimum date to today
           required
         />
       </div>
