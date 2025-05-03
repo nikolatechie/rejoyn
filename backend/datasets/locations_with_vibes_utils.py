@@ -91,7 +91,12 @@ def create_single_group_weight_vector(user_prefs):
 
     # Compute average
     group_avg = {f: group_raw[f] / len(user_prefs) for f in FEATURES}
-    return group_avg
+
+    # Normalise the group vector
+    total = sum(group_avg.values())
+    group_weights = {k: v / total for k, v in group_avg.items()}
+
+    return group_weights
 
 
 print(create_single_group_weight_vector(mock_user_prefs))
