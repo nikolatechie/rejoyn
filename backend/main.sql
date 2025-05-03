@@ -13,7 +13,7 @@ create table users (
     gender char(1) not null -- M, F, O
 );
 
--- select * from users
+select * from users;
 
 create table destinations_features (
 	id int not null primary key auto_increment,

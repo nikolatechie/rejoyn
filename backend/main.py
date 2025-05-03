@@ -1,18 +1,12 @@
+from datetime import date
 from fastapi import FastAPI, Query
 from typing import List
 import pandas as pd
 import json
-from datasets.mock_user_preferences import (
-    mock_user_prefs,
-)  # You can later map group_id to prefs
-
-# from datasets.locations_with_vibes_utils import (
-#     load_csv_values,
-#     apply_parse_vibes,
-#     create_single_group_weight_vector,
-#     score_destination,
-# )
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+from datasets import mock_user_preferences
+import db
 
 app = FastAPI()
 
@@ -33,4 +27,22 @@ def get_top_destinations(group_id: int = Query(..., description="Group ID")):
     return {"top_destinations": {"Belgrade": "Test"}}
 
 
+class UserRegistration(BaseModel):
+    full_name: str
+    email: str
+    password: str
+    dob: str
+    gender: str
+
+
+@app.post("/register")
+def register_user(user: UserRegistration):
+    # Simulate user registration logic
+    print("registering user")
+    print(user)
+    response = db.register_user(user)
+    return {"message": "User registered successfully"}
+
+
 # RUN APP: uvicorn main:app --reload
+# uvicorn main:app  --reload --host 0.0.0.0 --port 8000
