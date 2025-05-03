@@ -1,4 +1,5 @@
 import hashlib
+import hmac
 import mysql.connector
 
 
@@ -57,7 +58,7 @@ def login(user):
             input_hashed_password = hashlib.sha256(
                 user["password"].encode()
             ).hexdigest()
-            if hashlib.compare_digest(stored_hashed_password, input_hashed_password):
+            if hmac.compare_digest(stored_hashed_password, input_hashed_password):
                 print("Login successful")
                 return result["id"]  # Return user ID
             else:

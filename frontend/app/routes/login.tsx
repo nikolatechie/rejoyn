@@ -21,7 +21,6 @@ export default function Login() {
           })
         }
       );
-      // const data = await response.json();
       if (response.ok) {
         // success
         console.log("success");
@@ -29,7 +28,7 @@ export default function Login() {
       } else {
         const data = await response.json();
         console.log("fail");
-        alert(data.errorMessage);
+        alert(data.detail);
       }
     } catch (error) {
       console.log(error)

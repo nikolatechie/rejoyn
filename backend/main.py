@@ -7,6 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from datasets import mock_user_preferences
 import db
+from fastapi import HTTPException
 
 app = FastAPI()
 
@@ -56,7 +57,7 @@ def login_user(user: UserLogin):
     print(user)
     response = db.login(user.dict())
     if response is None:
-        return {"errorMessage": "Invalid credentials!"}
+        raise HTTPException(status_code=401, detail="Invalid credentials!")
 
     return {"message": "User signed in successfully"}
 
