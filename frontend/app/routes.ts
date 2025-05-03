@@ -11,7 +11,7 @@ export default [
     file: 'routes/login.tsx',
   },
   {
-    path: '/trip',
-    file: 'routes/trip.tsx'
+    path: '/tripform',
+    file: 'routes/tripform.tsx'
   }
 ] satisfies RouteConfig;
