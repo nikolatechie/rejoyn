@@ -1,3 +1,5 @@
+# Scores are 1-5, least to most important
+
 # Likes art, culture, museums, food, etc.
 user1 = {
     "art_and_culture": 4,

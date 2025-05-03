@@ -1,3 +1,4 @@
+from collections import defaultdict
 import json
 from typing import List, Dict
 import pandas as pd
@@ -80,9 +81,20 @@ def apply_parse_vibes(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-# Turn user preferences into a single group weight vector
-mock_user_prefs = mock_user_prefs
-print(mock_user_prefs)
+##### Turn user preferences into a single group weight vector
+def create_single_group_weight_vector(user_prefs):
+    group_raw = defaultdict(int)
+
+    for user in user_prefs:
+        for k, v in user.items():
+            group_raw[k] += v
+
+    # Compute average
+    group_avg = {f: group_raw[f] / len(user_prefs) for f in FEATURES}
+    return group_avg
+
+
+print(create_single_group_weight_vector(mock_user_prefs))
 
 # unique_vibes = _extract_unique_vibes("iata_airports_and_locations_with_vibes.csv")
 # print(unique_vibes)
