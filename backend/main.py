@@ -36,7 +36,7 @@ def _generate_description(row) -> str:
         model="gemini-2.0-flash",
         contents=f"""
         Give me a short description of maximum 4-5 sentences that would highlight the most important
-        stuff a tourist should know about destination {destination} and why they should visit it.
+        stuff a tourist should know about destination {destination} and why it's a perfect holiday getaway.
         """,
     )
     return response.text
