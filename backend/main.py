@@ -10,6 +10,11 @@ import db
 import datasets.locations_with_vibes_utils as destination_utils
 from fastapi import HTTPException
 from fastapi.responses import JSONResponse
+from datasets import gemini_api_key
+from google import genai
+
+
+client = genai.Client(api_key=gemini_api_key.API_KEY)
 
 app = FastAPI()
 
@@ -24,6 +29,19 @@ app.add_middleware(
 )
 
 
+def _generate_description(row) -> str:
+    # print("this row", type(row), row)
+    destination = row["en-GB"]
+    response = client.models.generate_content(
+        model="gemini-2.0-flash",
+        contents=f"""
+        Give me a short description of maximum 4-5 sentences that would highlight the most important
+        stuff a tourist should know about destination {destination} and why they should visit it.
+        """,
+    )
+    return response.text
+
+
 @app.get("/top-destinations")
 def get_top_destinations(group_id: int = Query(..., description="Group ID")):
     print(group_id)
@@ -31,6 +49,10 @@ def get_top_destinations(group_id: int = Query(..., description="Group ID")):
     user_prefs = db.get_user_preferences(users)
     top_destinations = destination_utils.get_top_destinations(user_prefs)
     print(top_destinations.columns)
+    # Generate descriptions of destinations
+    top_destinations["description"] = top_destinations.apply(
+        lambda row: _generate_description(row), axis=1
+    )
     top_destinations_dict = top_destinations.to_dict(orient="records")
     return JSONResponse(content={"top_destinations": top_destinations_dict})
 
