@@ -7,6 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from datasets import mock_user_preferences
 import db
+from fastapi import HTTPException
 
 app = FastAPI()
 
@@ -35,13 +36,30 @@ class UserRegistration(BaseModel):
     gender: str
 
 
+class UserLogin(BaseModel):
+    email: str
+    password: str
+
+
 @app.post("/register")
 def register_user(user: UserRegistration):
-    # Simulate user registration logic
+    # User registration logic
     print("registering user")
     print(user)
     response = db.register_user(user.dict())
     return {"message": "User registered successfully"}
+
+
+@app.post("/login")
+def login_user(user: UserLogin):
+    # User login logic
+    print("logging in user")
+    print(user)
+    response = db.login(user.dict())
+    if response is None:
+        raise HTTPException(status_code=401, detail="Invalid credentials!")
+
+    return {"message": "User signed in successfully"}
 
 
 # RUN APP: uvicorn main:app --reload

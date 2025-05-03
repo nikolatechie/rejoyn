@@ -15,6 +15,8 @@ create table users (
 
 select * from users;
 
+delete from users where id = 1;
+
 create table destinations_features (
 	id int not null primary key auto_increment,
     feature varchar(100) not null unique
