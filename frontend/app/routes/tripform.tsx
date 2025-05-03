@@ -3,13 +3,10 @@ import React, { useState } from "react";
 const TripForm: React.FC = () => {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
-  const [submitted, setSubmitted] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (startDate && endDate) {
-      setSubmitted(true);
-    }
+    console.log(startDate, endDate);
   };
 
   return (
@@ -49,7 +46,7 @@ const TripForm: React.FC = () => {
         />
       </div>
       <div className="text-end">
-        <button type="submit" className="btn btn-primary">
+        <button type="submit" className="btn btn-primary" onClick={handleSubmit}>
           Get recommendations
         </button>
       </div>

@@ -93,7 +93,7 @@ export default function Register() {
           type="date"
           className="form-control"
           id="dob"
-          placeholder=""
+          max={new Date().toISOString().split("T")[0]}
           onChange={(e) => setDob(e.target.value)}
         />
       </div>
