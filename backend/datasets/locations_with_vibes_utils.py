@@ -1,6 +1,7 @@
 import json
 from typing import List, Dict
 import pandas as pd
+from mock_user_preferences import mock_user_prefs
 
 
 # Prevent trimming the output
@@ -78,6 +79,10 @@ def apply_parse_vibes(df: pd.DataFrame) -> pd.DataFrame:
     df["vibes"] = df["vibes"].apply(_parse_vibes)
     return df
 
+
+# Turn user preferences into a single group weight vector
+mock_user_prefs = mock_user_prefs
+print(mock_user_prefs)
 
 # unique_vibes = _extract_unique_vibes("iata_airports_and_locations_with_vibes.csv")
 # print(unique_vibes)
