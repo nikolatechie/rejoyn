@@ -10,11 +10,11 @@ import db
 import datasets.locations_with_vibes_utils as destination_utils
 from fastapi import HTTPException
 from fastapi.responses import JSONResponse
-from datasets import gemini_api_key
+from datasets import api_keys
 from google import genai
 
 
-client = genai.Client(api_key=gemini_api_key.API_KEY)
+client = genai.Client(api_key=api_keys.GEMINI_API_KEY)
 
 app = FastAPI()
 
