@@ -1,6 +1,11 @@
 import json
-from typing import List
+from typing import List, Dict
 import pandas as pd
+
+
+# Prevent trimming the output
+pd.set_option("display.max_colwidth", None)
+
 
 # List of features related to trip preferences
 FEATURES: None | List[str] = [
@@ -54,12 +59,25 @@ def _extract_unique_vibes(file_path: str) -> None | list[str]:
         return None
 
 
-def _parse_vibes(vibes):
+def _parse_vibes(vibes) -> Dict[str, int]:
+    DEFAULT_VALUE = 0.5  # Assume neutral if unknown
     if pd.isna(vibes) or vibes == "null":
-        pass
+        return {feature: DEFAULT_VALUE for feature in FEATURES}
+    elif len(vibes) < len(FEATURES):
+        # Some features are missing
+        for feature in FEATURES:
+            if feature not in vibes:
+                # Add them with neutral values
+                vibes[feature] = DEFAULT_VALUE
 
     return json.loads(vibes)
 
 
-unique_vibes = _extract_unique_vibes("iata_airports_and_locations_with_vibes.csv")
-print(unique_vibes)
+def apply_parse_vibes(df: pd.DataFrame) -> pd.DataFrame:
+    # vibes_df = load_csv_values("iata_airports_and_locations_with_vibes.csv")
+    df["vibes"] = df["vibes"].apply(_parse_vibes)
+    return df
+
+
+# unique_vibes = _extract_unique_vibes("iata_airports_and_locations_with_vibes.csv")
+# print(unique_vibes)
