@@ -3,6 +3,7 @@ import json
 from typing import List, Dict
 import pandas as pd
 from mock_user_preferences import mock_user_prefs
+import random
 
 
 # Prevent trimming the output
@@ -20,6 +21,21 @@ FEATURES: None | List[str] = [
     "safety",  # Added
     "weather",  # Added
 ]
+
+
+# Enrich the dataset with artificial data
+def _add_new_features(vibes):
+    if pd.isna(vibes) or vibes == "null":
+        rnd_feature = random.randint(0, len(FEATURES) - 1)
+        vibes_dict = {FEATURES[rnd_feature]: 1}
+    else:
+        vibes_dict = json.loads(vibes)
+
+    # Add new features with default values
+    vibes_dict["safety"] = 1
+    vibes_dict["weather"] = 1
+
+    return json.dumps(vibes_dict)
 
 
 def load_csv_values(file_path: str) -> pd.DataFrame:
@@ -110,12 +126,19 @@ def score_destination(vibes, group_weights, neutral_score=0.5):
     )  # Denominator
     if max_possible_score == 0:
         return 0.0
-    normalized_score = raw_score / max_possible_score
-    return normalized_score
+    normalised_score = raw_score / max_possible_score
+    return normalised_score
 
 
 if __name__ == "__main__":
-    df = load_csv_values("iata_airports_and_locations_with_vibes.csv")
+    # df = load_csv_values("iata_airports_and_locations_with_vibes.csv")
+    df = load_csv_values("modified_locations_with_vibes.csv")
+
+    # One time vibes enrichment
+    # df["vibes"] = df["vibes"].apply(_add_new_features)
+    # Export the modified DataFrame to a new CSV file
+    # df.to_csv("modified_locations_with_vibes.csv", index=False)
+
     df = apply_parse_vibes(df)
     group_weights = create_single_group_weight_vector(
         mock_user_prefs
