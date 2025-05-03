@@ -40,7 +40,7 @@ def register_user(user: UserRegistration):
     # Simulate user registration logic
     print("registering user")
     print(user)
-    response = db.register_user(user)
+    response = db.register_user(user.dict())
     return {"message": "User registered successfully"}
 
 
