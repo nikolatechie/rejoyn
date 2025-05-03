@@ -5,6 +5,35 @@ const TripForm: React.FC = () => {
   const [endDate, setEndDate] = useState("");
   const [loading, setLoading] = useState(false)
   const [topDestinations, setTopDestinations] = useState([]);
+  const [photoUrl, setPhotoUrl] = useState({});
+
+  const fetchPhoto = async (destination: string) => {
+    console.log("trying to fetch photo for destination " + destination);
+    try {
+      const response = await fetch(`https://api.pexels.com/v1/search?query=${destination}%20city`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "5M4qD8OfHFDzrp5wJGlj2mrWv3UgZI56rNggmaQJWesluZG9jGW0k0Sb"
+        },
+      });
+      console.log(response);
+      const data = await response.json();
+      console.log(data);
+      if (response.ok) {
+        // success
+        console.log(data.photos[1].url);
+        return [data.photos[0].src.medium, data.photos[1].src.medium, data.photos[3].src.medium];
+      } else {
+        console.log("fail");
+        // alert(data.errorMessage);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+
+    return [];
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,6 +54,16 @@ const TripForm: React.FC = () => {
         console.log("success");
         console.log(data);
         setTopDestinations(data.top_destinations);
+
+        const photoUrls: { [key: string]: string[] } = {};
+        for (const destination of data.top_destinations) {
+          const photos = await fetchPhoto(destination["en-GB"]);
+          if (photos) {
+            photoUrls[destination["en-GB"]] = photos;
+          }
+        }
+        console.log(photoUrls);
+        setPhotoUrl(photoUrls);
       } else {
         console.log("fail");
         // alert(data.errorMessage);
@@ -82,7 +121,14 @@ const TripForm: React.FC = () => {
           <ul style={{ marginTop: "40px" }}>
             {topDestinations.map((destination, index) => (
               <li key={index} style={{ marginBottom: "20px" }}>
-                <strong>{index + 1}</strong><br />
+                <br />
+                {Object.keys(photoUrl).length > 0 && (
+                  <div style={{ display: "flex", gap: "10px" }}>
+                    <img src={photoUrl[destination['en-GB']][0]} alt="Destination 1" style={{ maxWidth: "200px", height: "auto" }} />
+                    <img src={photoUrl[destination['en-GB']][1]} alt="Destination 2" style={{ maxWidth: "200px", height: "auto" }} />
+                    <img src={photoUrl[destination['en-GB']][2]} alt="Destination 2" style={{ maxWidth: "200px", height: "auto" }} />
+                  </div>
+                )}
                 <strong>Destination:</strong> {destination["en-GB"]} <br />
                 <strong>Score:</strong> {(parseFloat(destination['score']) * 100).toFixed(0)}%<br />
                 <strong>Description:</strong> {destination['description']} <br />
