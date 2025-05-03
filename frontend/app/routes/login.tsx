@@ -1,4 +1,70 @@
+import { useState } from "react";
 
 export default function Login() {
-  return <h2>Login here</h2>
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+
+  const onLogin = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+
+    try {
+      const response = await fetch(
+        `http://0.0.0.0:8000/login`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email,
+            password,
+          })
+        }
+      );
+      // const data = await response.json();
+      if (response.ok) {
+        // success
+        console.log("success");
+        // console.log(data);
+      } else {
+        const data = await response.json();
+        console.log("fail");
+        alert(data.errorMessage);
+      }
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  return (
+    <div style={{
+      maxWidth: "50%",
+      margin: "auto",
+      marginTop: "100px"
+    }}>
+      <div className="mb-3">
+        <label htmlFor="email" className="form-label">Email address</label>
+        <input
+          type="email"
+          className="form-control"
+          id="email"
+          placeholder="name@example.com"
+          onChange={(e) => setEmail(e.target.value)}
+        />
+      </div>
+      <div className="mb-3">
+        <label htmlFor="password" className="form-label">Password</label>
+        <input
+          type="password"
+          className="form-control"
+          id="password"
+          placeholder=""
+          onChange={(e) => setPassword(e.target.value)}
+        />
+      </div>
+      <div className="mb-3" style={{ textAlign: "right" }}>
+        <button type="button" className="btn btn-primary" onClick={onLogin}>Login</button>
+      </div>
+    </div>
+  )
 }
