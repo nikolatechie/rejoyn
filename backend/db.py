@@ -76,8 +76,42 @@ def login(user):
 
 
 def get_user_ids_for_group(group_id: int) -> list[int]:
-    return []
+    connection = get_connection()
+    cursor = connection.cursor()
+    try:
+        query = """
+        SELECT user_id FROM user_groups
+        WHERE group_id = %s
+        """
+        cursor.execute(query, (group_id,))
+        result = cursor.fetchall()
+        return [row[0] for row in result]
+    except mysql.connector.Error as err:
+        print(f"Error: {err}")
+        return []
+    finally:
+        cursor.close()
+        connection.close()
 
 
 def get_user_preferences(user_ids: list[int]) -> list[dict]:
-    return []
+    connection = get_connection()
+    cursor = connection.cursor(dictionary=True)
+    try:
+        query = """
+        SELECT up.user_id, df.feature, up.score
+        FROM users_preferences up
+        JOIN destinations_features df ON up.feature_id = df.id
+        WHERE up.user_id IN (%s)
+        """ % ",".join(
+            ["%s"] * len(user_ids)
+        )
+        cursor.execute(query, tuple(user_ids))
+        result = cursor.fetchall()
+        return result
+    except mysql.connector.Error as err:
+        print(f"Error: {err}")
+        return []
+    finally:
+        cursor.close()
+        connection.close()

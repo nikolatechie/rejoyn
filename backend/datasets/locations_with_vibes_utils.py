@@ -2,13 +2,16 @@ from collections import defaultdict
 import json
 from typing import List, Dict
 import pandas as pd
-from mock_user_preferences import mock_user_prefs
+
+# import datasets.mock_user_preferences.mock_user_prefs
+from datasets.mock_user_preferences import get_mock_user_prefs
 import random
 
 
 # Prevent trimming the output
 pd.set_option("display.max_colwidth", None)
 
+mock_user_prefs = get_mock_user_prefs()
 
 # List of features related to trip preferences
 FEATURES: None | List[str] = [
@@ -78,17 +81,31 @@ def _extract_unique_vibes(file_path: str) -> None | list[str]:
 
 
 def _parse_vibes(vibes) -> Dict[str, int]:
+    if isinstance(vibes, str):
+        print("yes, it's a string")
+        try:
+            vibes = json.loads(vibes)
+        except json.JSONDecodeError:
+            vibes = {}
+    # print(vibes_dict)
+    print("vibes: ", type(vibes), vibes, len(vibes), len(FEATURES))
     DEFAULT_VALUE = 0.5  # Assume neutral if unknown
     if pd.isna(vibes) or vibes == "null":
+        print("it's empty")
         return {feature: DEFAULT_VALUE for feature in FEATURES}
     elif len(vibes) < len(FEATURES):
+        print("checking lengths")
+        print(len(vibes))
+        print(len(FEATURES))
         # Some features are missing
         for feature in FEATURES:
             if feature not in vibes:
                 # Add them with neutral values
                 vibes[feature] = DEFAULT_VALUE
 
-    return json.loads(vibes)
+    print("pass all")
+
+    return vibes
 
 
 def apply_parse_vibes(df: pd.DataFrame) -> pd.DataFrame:
@@ -99,20 +116,27 @@ def apply_parse_vibes(df: pd.DataFrame) -> pd.DataFrame:
 
 ##### Turn user preferences into a single group weight vector
 def create_single_group_weight_vector(user_prefs):
+    print("user_prefs: ", user_prefs)
     group_raw = defaultdict(int)
+    print("group_raw:", group_raw)
 
     for user in user_prefs:
-        for k, v in user.items():
-            group_raw[k] += v
+        # for k, v in user.items():
+        # print("burek", k, v)
+        # print(user)
+        group_raw[user["feature"]] += user["score"]
 
+    print("group_raw:", group_raw)
     # Compute average
     group_avg = {f: group_raw[f] / len(user_prefs) for f in FEATURES}
+    print("group_avg:", group_avg)
 
     # Normalise the group vector
     # total = sum(group_avg.values())
-    group_weights = {k: (v - 1) / 4 for k, v in group_avg.items()}
-
-    return group_weights
+    # group_weights = {k: (v - 1) / 4 for k, v in group_avg.items()}
+    # print("group_weights:", group_weights)
+    return group_raw
+    # return group_weights
 
 
 # Rate each destination based on group weights
@@ -130,6 +154,30 @@ def score_destination(vibes, group_weights, neutral_score=0.5):
     return normalised_score
 
 
+def get_top_destinations(user_prefs):
+    print("user_prefs here")
+    print(user_prefs)
+    df = load_csv_values("datasets/modified_locations_with_vibes.csv")
+    # print("before apply parse")
+    # print(df)
+    # print("features ", FEATURES)
+    df = apply_parse_vibes(df)
+    print("after parse vibes")
+    print(df["vibes"].head(50))
+    # print("type user_prefs", type(user_prefs))
+    group_weights = create_single_group_weight_vector(
+        user_prefs=user_prefs  # list of user prefs
+    )
+    print("finished group weights")
+    df["score"] = df["vibes"].apply(score_destination, group_weights=group_weights)
+    print("omlet", df["score"])
+
+    # Get top 10 destinations for the group
+    top_destinations = df.sort_values(by="score", ascending=False).head(10)
+    print("top_destinations", top_destinations)
+    return top_destinations  # [id, IATA, en-GB, latitude, longitude, vibes, score]
+
+
 if __name__ == "__main__":
     # df = load_csv_values("iata_airports_and_locations_with_vibes.csv")
     df = load_csv_values("modified_locations_with_vibes.csv")
@@ -141,13 +189,14 @@ if __name__ == "__main__":
 
     df = apply_parse_vibes(df)
     group_weights = create_single_group_weight_vector(
-        mock_user_prefs
+        mock_user_prefs  # list of user prefs
     )  # Mock user prefs
     df["score"] = df["vibes"].apply(score_destination, group_weights=group_weights)
 
     # Get top 10 destinations for the group
     top_destinations = df.sort_values(by="score", ascending=False).head(10)
     print(top_destinations)
+    print(top_destinations.columns)
 
 
 # unique_vibes = _extract_unique_vibes("iata_airports_and_locations_with_vibes.csv")

@@ -43,3 +43,33 @@ create table users_preferences (
     foreign key (user_id) references users(id),
     foreign key (feature_id) references destinations_features(id)
 );
+
+create table user_groups (
+	id int not null primary key auto_increment,
+    group_id int not null,
+    user_id int not null,
+    foreign key (user_id) references users(id)
+);
+
+-- Select data from all tables
+show tables;
+select * from users;
+select * from users_preferences;
+select * from destinations_features;
+select * from user_groups;
+
+insert into user_groups (group_id, user_id)
+values
+	(0, 2),
+    (0, 3),
+    (0, 4),
+    (0, 5),
+    (0, 6);
+
+insert into users_preferences (user_id, feature_id, score)
+values
+(2, 2, 4), (2, 4, 4), (2, 8, 5),
+(3, 1, 4), (3, 7, 4),
+(4, 3, 5), (4, 4, 5), (4, 6, 3), (4, 7, 4),
+(5, 1, 4), (5, 3, 4), (5, 4, 4),
+(6, 7, 3), (6, 8, 5), (6, 5, 4)

@@ -34,4 +34,7 @@ user3 = {
     "weather": 5,
 }
 
-mock_user_prefs = [user1, user2, user3]
+
+def get_mock_user_prefs():
+    mock_user_prefs = [user1, user2, user3]
+    return mock_user_prefs

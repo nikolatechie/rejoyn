@@ -3,10 +3,32 @@ import React, { useState } from "react";
 const TripForm: React.FC = () => {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+  const [topDestinations, setTopDestinations] = useState([]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     console.log(startDate, endDate);
+
+    try {
+      const response = await fetch(`http://0.0.0.0:8000/top-destinations?group_id=0`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const data = await response.json();
+      if (response.ok) {
+        // success
+        console.log("success");
+        console.log(data);
+        setTopDestinations(data.top_destinations);
+      } else {
+        console.log("fail");
+        // alert(data.errorMessage);
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (

@@ -7,7 +7,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from datasets import mock_user_preferences
 import db
+import datasets.locations_with_vibes_utils as destination_utils
 from fastapi import HTTPException
+from fastapi.responses import JSONResponse
 
 app = FastAPI()
 
@@ -25,7 +27,12 @@ app.add_middleware(
 @app.get("/top-destinations")
 def get_top_destinations(group_id: int = Query(..., description="Group ID")):
     print(group_id)
-    return {"top_destinations": {"Belgrade": "Test"}}
+    users = db.get_user_ids_for_group(group_id=group_id)
+    user_prefs = db.get_user_preferences(users)
+    top_destinations = destination_utils.get_top_destinations(user_prefs)
+    print(top_destinations.columns)
+    top_destinations_dict = top_destinations.to_dict(orient="records")
+    return JSONResponse(content={"top_destinations": top_destinations_dict})
 
 
 class UserRegistration(BaseModel):
