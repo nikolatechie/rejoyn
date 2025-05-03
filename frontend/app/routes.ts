@@ -10,4 +10,8 @@ export default [
     path: '/login',
     file: 'routes/login.tsx',
   },
+  {
+    path: '/trip',
+    file: 'routes/trip.tsx'
+  }
 ] satisfies RouteConfig;
