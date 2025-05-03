@@ -1,6 +1,8 @@
 import { useState } from "react";
+import { useNavigate } from "react-router";
 
 export default function Login() {
+  const navigate = useNavigate();
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
 
@@ -24,6 +26,7 @@ export default function Login() {
       if (response.ok) {
         // success
         console.log("success");
+        navigate('/tripform');
         // console.log(data);
       } else {
         const data = await response.json();

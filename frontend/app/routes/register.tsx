@@ -1,6 +1,8 @@
 import { useState } from "react";
+import { useNavigate } from "react-router";
 
 export default function Register() {
+  const navigate = useNavigate();
   const [fullName, setFullName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -31,6 +33,7 @@ export default function Register() {
       if (response.ok) {
         // success
         console.log("success");
+        navigate("/login");
         // console.log(data);
       } else {
         console.log("fail");
