@@ -37,6 +37,7 @@ def _generate_description(row) -> str:
         contents=f"""
         Give me a short description of maximum 4-5 sentences that would highlight the most important
         stuff a tourist should know about destination {destination} and why it's a perfect holiday getaway.
+        The destination {destination} is not an airport! It can be a town, city, historical landmark, etc.
         """,
     )
     return response.text
