@@ -12,7 +12,7 @@ A web app designed to help groups of friends find their ideal getaway destinatio
 
 ### Tech Stack
 * Backend: **Python FastAPI**
-* Frontend: **React Router + TypeScript**
+* Frontend: **React Router + TypeScript + Bootstrap**
 * Database: **MySQL**
 * APIs: **Gemini, Pexel**
 
