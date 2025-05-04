@@ -130,7 +130,8 @@ const TripForm: React.FC = () => {
                   </div>
                 )}
                 <strong>Destination:</strong> {destination["en-GB"]} <br />
-                <strong>Score:</strong> {(parseFloat(destination['score']) * 100).toFixed(0)}%<br />
+                <strong>Match:</strong> {(parseFloat(destination['score']) * 100).toFixed(0)}%<br />
+                <strong>5-star ratings:</strong> {destination['liked_percentage']}%<br />
                 <strong>Description:</strong> {destination['description']} <br />
                 <strong>Vibes:</strong> {Object.keys(destination['vibes'])
                   .filter((key) => destination['vibes'][key] === "1")

@@ -12,6 +12,7 @@ from fastapi import HTTPException
 from fastapi.responses import JSONResponse
 from datasets import api_keys
 from google import genai
+import random
 
 
 client = genai.Client(api_key=api_keys.GEMINI_API_KEY)
@@ -43,6 +44,10 @@ def _generate_description(row) -> str:
     return response.text
 
 
+def _get_liked_by(_row):
+    return random.randint(86, 100)
+
+
 @app.get("/top-destinations")
 def get_top_destinations(group_id: int = Query(..., description="Group ID")):
     print(group_id)
@@ -53,6 +58,9 @@ def get_top_destinations(group_id: int = Query(..., description="Group ID")):
     # Generate descriptions of destinations
     top_destinations["description"] = top_destinations.apply(
         lambda row: _generate_description(row), axis=1
+    )
+    top_destinations["liked_percentage"] = top_destinations.apply(
+        lambda row: _get_liked_by(row), axis=1
     )
     top_destinations_dict = top_destinations.to_dict(orient="records")
     return JSONResponse(content={"top_destinations": top_destinations_dict})
